@@ -1,6 +1,8 @@
 const loadingSpinner = document.getElementById('loading');
 let barChart, doughnutChart, lineChart; // Global variables to store chart instances
 
+let currentTempCelsius;
+
 // Detect if using the mobile or desktop button
 document.querySelectorAll('#getWeather, #getWeatherMobile').forEach(button => {
   button.addEventListener('click', function() {
@@ -41,6 +43,9 @@ function fetchWeatherData(city) {
       // Update weather icon
       const iconCode = data.weather[0].icon;
       document.getElementById('weatherIcon').src = `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
+      // Handle temperature unit toggle
+      currentTempCelsius = data.main.temp;
 
       // Handle background change based on weather condition
       const weatherCondition = data.weather[0].main.toLowerCase();
@@ -165,6 +170,9 @@ function fetchWeatherByLocation(latitude, longitude) {
       const iconCode = data.weather[0].icon;
       document.getElementById('weatherIcon').src = `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
 
+      //Handle temperature unit toggle
+      currentTempCelsius = data.main.temp;
+
       // Handle background change
       const weatherCondition = data.weather[0].main.toLowerCase();
       const currentTime = Date.now() / 1000;
@@ -219,17 +227,16 @@ function changeBackground(weatherCondition, isDay) {
 function handleTemperatureToggle(temperatureCelsius) {
   const celsiusBtn = document.getElementById('celsiusBtn');
   const fahrenheitBtn = document.getElementById('fahrenheitBtn');
-  let currentTemp = temperatureCelsius;
 
   celsiusBtn.addEventListener('click', () => {
-    document.getElementById('temperature').innerText = `${Math.round(currentTemp)}°C`;
+    document.getElementById('temperature').innerText = `${Math.round(currentTempCelsius)}°C`;
     celsiusBtn.classList.add('bg-[#62a1c7]', 'text-white');
     fahrenheitBtn.classList.remove('bg-[#62a1c7]', 'text-white');
     fahrenheitBtn.classList.add('bg-gray-300', 'text-black');
   });
 
   fahrenheitBtn.addEventListener('click', () => {
-    const tempFahrenheit = (currentTemp * 9/5) + 32;
+    const tempFahrenheit = (currentTempCelsius * 9/5) + 32;
     document.getElementById('temperature').innerText = `${Math.round(tempFahrenheit)}°F`;
     fahrenheitBtn.classList.add('bg-[#62a1c7]', 'text-white');
     celsiusBtn.classList.remove('bg-[#62a1c7]', 'text-white');
