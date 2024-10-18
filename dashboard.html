@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body {
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+    .clear-day {
+      background-image: url(clear_sky_day.jpg);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .clear-night {
+      background-image: url(clear_sky_night.jpg);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .cloudy-day {
+      background-image: url(cloudy_day.jpg);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .cloudy-night {
+      background-image: url(cloudy_night.webp);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .rainy-day {
+      background-image: url(rainy_day.jpg);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .rainy-night {
+      background-image: url(rainy_night.jpg);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .snowy {
+      background-image: url(snowy.jpg);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .stormy {
+      background-image: url(thunderstorm.webp);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .misty-day {
+      background-image: url(misty_day.jpg);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .misty-night {
+      background-image: url(misty_night.jpg);
+      background-size: cover;
+      background-position: center;
+    }
+  </style>  
+</head>
+<body class="bg-gray-100">
+
+  <!-- Main container -->
+  <div class="flex flex-col md:flex-row min-h-screen">
+    
+    <!-- Side menu for larger screens -->
+    <aside class="md:w-1/4 bg-[#528ab4] text-white p-4 hidden md:block">
+      <div class="text-center mb-8">
+        <img src="logo.png" alt="WeatherVue">
+      </div>
+      <nav class="space-y-4">
+        <a href="dashboard.html" class="block py-2 px-4 bg-[#62a1c7] rounded-md text-center hover:bg-[#7bc7dd]">
+          Dashboard
+        </a>
+        <a href="table.html" class="block py-2 px-4 bg-[#62a1c7] rounded-md text-center hover:bg-[#7bc7dd]">
+          Tables
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Header for mobile and user profile -->
+    <div class="bg-[#528ab4] text-white p-4 md:hidden flex justify-between items-center">
+      <img src="logo.png" alt="WeatherVue" class="h-10">
+      <button id="userProfileMobile" class="w-10 h-10 text-white flex items-center justify-center">
+        <i class="fas fa-user-circle text-3xl"></i>
+      </button>
+    </div>
+
+    <!-- Navigation bar for mobile -->
+    <nav class="md:hidden bg-[#62a1c7] text-white p-2 flex justify-center space-x-4">
+      <a href="dashboard.html" class="py-2 px-4 bg-[#7bc7dd] rounded-md text-center hover:bg-[#528ab4]">Dashboard</a>
+      <a href="table.html" class="py-2 px-4 bg-[#7bc7dd] rounded-md text-center hover:bg-[#528ab4]">Tables</a>
+    </nav>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="fixed inset-0 bg-gray-100 bg-opacity-50 hidden flex justify-center items-center">
+      <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+
+    <!-- Content area -->
+    <main id="main" class="md:3/4 flex-grow p-8">
+
+      <!-- Header with Search Bar and User Profile for larger screens -->
+      <div class="hidden md:flex justify-between mb-8">
+        <input id="city" type="text" class="flex-grow p-2 rounded-l-md focus:outline-none  focus:border-blue-500 focus:border-2" placeholder="Search for a city..." />
+        <button id="getWeather" class="bg-[#62a1c7] text-white px-4 py-2 rounded-r-md hover:bg-[#7bc7dd]">
+          Get Weather
+        </button>
+
+        <button id="userProfile" class="ml-4 w-12 h-12 rounded-full text-gray-400 flex items-center justify-center hover:bg-black hover:text-[#62a1c7] transition">
+          <i class="fas fa-user-circle text-5xl"></i>
+        </button>
+      </div>
+
+      <!-- Search Bar for mobile view -->
+      <div class="md:hidden flex mb-4 w-full">
+        <input id="cityMobile" type="text" class="flex-grow p-2 rounded-l-md focus:outline-none focus:border-blue-500 focus:border-2" placeholder="Search for a city..." />
+        <button id="getWeatherMobile" class="bg-[#62a1c7] text-white px-4 py-2 rounded-r-md hover:bg-[#7bc7dd]">
+          Get Weather
+        </button>
+      </div>
+
+      <!-- Weather widget -->
+      <section id="weatherWidget" class="bg-white bg-opacity-30 backdrop-blur-sm shadow-lg p-6 rounded-lg mb-8 overflow-hidden hover:scale-105 transition-transform duration-300">
+        <h2 class="text-3xl font-bold mb-2" id="cityName"><span id="cityDisplay">City Name</span></h2>
+        <img id="weatherIcon" src="" alt="Weather Icon" class="w-16 h-16 mr-4" />
+
+        <!-- Weather details -->
+        <div class="flex flex-col mb-4">
+          
+          <div class="flex flex-row gap-4 w-full">
+            <p id="temperature" class="text-3xl font-bold mr-4">0°C</p>
+            <button id="celsiusBtn" class="bg-[#62a1c7] text-white px-2 py-1 rounded-md hover:bg-[#7bc7dd]">Celsius</button>
+            <button id="fahrenheitBtn" class="bg-gray-300 text-black px-2 py-1 rounded-md hover:bg-gray-400">Fahrenheit</button>
+          </div>
+          <p id="weatherDescription" class="text-md font-semibold mt-2 mb-4">Weather Description</p>
+
+          <div class="flex flex-row gap-14">
+            <div class="py-2">
+              <p class="font-bold">Humidity:</p>
+              <p id="humidity">0%</p>
+            </div>
+            <div class="py-2">
+              <p class="font-bold">Wind Speed:</p>
+              <p id="windSpeed">0 m/s</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- Charts Section -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Vertical Bar Chart -->
+        <div class="bg-white bg-opacity-30 backdrop-blur-sm shadow-lg p-6 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+          <h3 class="text-xl font-bold mb-4">Vertical Bar Chart</h3>
+          <canvas id="barChart"></canvas>
+        </div>
+
+        <!-- Doughnut Chart -->
+        <div class="bg-white bg-opacity-30 backdrop-blur-sm shadow-lg p-6 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+          <h3 class="text-xl font-bold mb-4">Doughnut Chart</h3>
+          <canvas id="doughnutChart"></canvas>
+        </div>
+
+        <!-- Line Chart -->
+        <div class="bg-white bg-opacity-30 backdrop-blur-sm shadow-lg p-6 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+          <h3 class="text-xl font-bold mb-4">Line Chart</h3>
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="app.js"></script>
+
+</body>
+</html>

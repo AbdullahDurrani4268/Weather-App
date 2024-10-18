@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Tables</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    body {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .message {
+        margin-bottom: 10px;
+        padding: 8px;
+        border-radius: 4px;
+        max-width: 80%;
+    }
+    .user-message {
+        background-color: #e2f0ff;
+        margin-left: auto;
+    }
+    .bot-message {
+        background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Main container -->
+  <div class="flex flex-col md:flex-row min-h-screen">
+    
+    <!-- Side menu -->
+    <aside class="w-1/4 bg-[#528ab4] text-white p-4 hidden md:block">
+      <div class="text-center mb-8">
+        <img src="logo.png" alt="WeatherVue">
+      </div>
+      <nav class="space-y-4">
+        <a href="dashboard.html" class="block py-2 px-4 bg-[#62a1c7] shadow-lg rounded-md text-center hover:bg-[#7bc7dd]">
+          Dashboard
+        </a>
+        <a href="table.html" class="block py-2 px-4 bg-[#62a1c7] shadow-lg rounded-md text-center hover:bg-[#7bc7dd]">
+          Tables
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Header for mobile and user profile -->
+    <div class="bg-[#528ab4] text-white p-4 md:hidden flex justify-between items-center">
+      <img src="logo.png" alt="WeatherVue" class="h-10">
+      <button id="userProfileMobile" class="w-10 h-10 text-white flex items-center justify-center">
+        <i class="fas fa-user-circle text-3xl"></i>
+      </button>
+    </div>
+
+    <!-- Navigation bar for mobile -->
+    <nav class="md:hidden bg-[#62a1c7] text-white p-2 flex justify-center space-x-4">
+      <a href="dashboard.html" class="py-2 px-4 bg-[#7bc7dd] rounded-md text-center hover:bg-[#528ab4]">Dashboard</a>
+      <a href="table.html" class="py-2 px-4 bg-[#7bc7dd] rounded-md text-center hover:bg-[#528ab4]">Tables</a>
+    </nav>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="fixed inset-0 bg-gray-100 bg-opacity-50 hidden flex justify-center items-center">
+      <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+
+    <!-- Content area -->
+    <main class="md:w-3/4 flex-grow p-8">
+
+      <!-- Header with Search Bar and User Profile -->
+      <div class="hidden md:flex justify-between mb-8">
+        <input id="city" type="text" class="flex-grow bg-gray-100 p-2 rounded-l-md focus:outline-none focus:border-blue-500 focus:border-2" placeholder="Search for a city..." />
+        <button id="getWeather" class="bg-[#62a1c7] text-white px-4 py-2 rounded-r-md hover:bg-[#7bc7dd]">
+          Get Weather
+        </button>
+
+        <button id="userProfile" class="ml-4 w-12 h-12 rounded-full text-black flex items-center justify-center hover:bg-black hover:text-[#62a1c7] transition">
+          <i class="fas fa-user-circle text-5xl"></i>
+        </button>
+      </div>
+
+      <!-- Search Bar for mobile view -->
+      <div class="md:hidden flex justify-center mb-4 w-full">
+        <input id="cityMobile" type="text" class="flex-grow bg-gray-100 p-2 rounded-l-md focus:outline-none focus:border-blue-500 focus:border-2" placeholder="Search for a city..." />
+        <button id="getWeatherMobile" class="bg-[#62a1c7] text-white px-4 py-2 rounded-r-md hover:bg-[#7bc7dd]">
+          Get Weather
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Table -->
+        <div class="bg-gray-100 shadow-lg p-6 rounded-md mb-8 hover:scale-105 transition-transform duration-300">
+          <div class="flex justify-between mb-6">
+            <h2 class="text-2xl font-bold mb-4">5-Day Forecast</h2>
+            <select id="tableFilter" class="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="">All</option>
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+                <option value="rain">Rainy Days</option>
+                <option value="max">Highest Temp</option>
+            </select>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full table-auto">
+              <thead>
+                <tr class="bg-gray-100">
+                  <th class="border px-4 py-2">Date</th>
+                  <th class="border px-4 py-2">Time</th>
+                  <th class="border px-4 py-2">Temp</th>
+                  <th class="border px-4 py-2">Weather Condition</th>
+                </tr>
+              </thead>
+              <tbody id="forecastTable">
+                <!-- Rows will be inserted dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination controls -->
+          <div class="flex justify-center mt-4">
+            <button id="prevPage" class="bg-[#62a1c7] text-white px-4 py-2 rounded-l-md hover:bg-[#7bc7dd]" disabled>Previous</button>
+            <button id="nextPage" class="bg-[#62a1c7] text-white px-4 py-2 rounded-r-md hover:bg-[#7bc7dd]">Next</button>
+          </div>
+        </div>
+
+        <!-- Chatbot Section -->
+        <div class="bg-gray-100 shadow-lg p-6 rounded-md hover:scale-105 transition-transform duration-300">
+          <h3 class="text-2xl font-bold mb-4">Chatbot</h3>
+          
+          <div class="flex mb-4 w-full">
+            <input id="user-input" type="text" placeholder="Ask the chatbot..." class="flex-grow focus:border-2 focus:border-gray-300 p-2 rounded-1-md">
+            <button id="send-button" class="bg-[#62a1c7] text-white px-4 py-2 rounded-r-md hover:bg-[#7bc7dd]">Send</button>
+          </div>
+
+          <div id="chat-messages" class="p-4 w-full border border-gray-300 rounded-md">
+            <!-- Chatbot messages will appear here -->
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="app2.js"></script>
+
+</body>
+</html>
