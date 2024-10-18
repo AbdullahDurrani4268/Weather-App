@@ -134,9 +134,9 @@
       </div>
 
       <!-- Search Bar for mobile view -->
-      <div class="md:hidden flex mb-4 w-full">
-        <input id="cityMobile" type="text" class="flex-grow p-2 rounded-l-md focus:outline-none focus:border-blue-500 focus:border-2" placeholder="Search for a city..." />
-        <button id="getWeatherMobile" class="bg-[#62a1c7] text-white px-4 py-2 rounded-r-md hover:bg-[#7bc7dd]">
+      <div class="md:hidden flex flex-col mb-4 w-full">
+        <input id="cityMobile" type="text" class="p-2 w-full rounded-md focus:outline-none focus:border-blue-500 focus:border-2" placeholder="Search for a city..." />
+        <button id="getWeatherMobile" class="bg-[#62a1c7] text-white px-4 py-2 rounded-md mt-2 w-full hover:bg-[#7bc7dd]">
           Get Weather
         </button>
       </div>
@@ -149,10 +149,10 @@
         <!-- Weather details -->
         <div class="flex flex-col mb-4">
           
-          <div class="flex flex-row gap-4 w-full">
+          <div class="flex flex-row flex-wrap gap-4 w-full">
             <p id="temperature" class="text-3xl font-bold mr-4">0°C</p>
-            <button id="celsiusBtn" class="bg-[#62a1c7] text-white px-2 py-1 rounded-md hover:bg-[#7bc7dd]">Celsius</button>
-            <button id="fahrenheitBtn" class="bg-gray-300 text-black px-2 py-1 rounded-md hover:bg-gray-400">Fahrenheit</button>
+            <button id="celsiusBtn" class="bg-[#62a1c7] text-white px-2 py-1 rounded-md hover:bg-[#7bc7dd] w-full sm:w-auto">Celsius</button>
+            <button id="fahrenheitBtn" class="bg-gray-300 text-black px-2 py-1 rounded-md hover:bg-gray-400 w-full sm:w-auto">Fahrenheit</button>
           </div>
           <p id="weatherDescription" class="text-md font-semibold mt-2 mb-4">Weather Description</p>
 
